@@ -11,13 +11,21 @@ image_sent = False
 
 while True:
     hologram = HologramCloud(dict(), network='cellular')
-    result = hologram.network.connect()
+
+    modem_disconnect = hologram.network.modem.disconnect()
+    network_disconnect = hologram.network.disconnect()
+
+    print "DISCONNECTIONS => Network: " + str(network_disconnect) + " Modem: " + str(modem_disconnect)
+
+    sleep(5)
 
     if image_sent:
         break
 
+    result = hologram.network.connect()
+
     if result == False:
-        print ' Failed to connect to cell network'
+        print ' Failed to connect to cell network. Try number ' + str(count + 1)
         if count > 4:
             break
         else:
@@ -62,7 +70,10 @@ while True:
             print hologram.getResultString(response_code)
             sleep(2)
 
-        hologram.network.disconnect()
+        final_modem_disconnect = hologram.network.modem.disconnect()
+        final_network_disconnect = hologram.network.disconnect()
+
+        print "FINAL DISCONNECTIONS => Network: " + str(final_network_disconnect) + " Modem: " + str(final_modem_disconnect)
 
         if os.path.exists(image_path):
             os.remove(image_path)
