@@ -10,7 +10,12 @@ count = 0
 image_sent = False
 
 while True:
-    hologram = HologramCloud(dict(), network='cellular')
+    try:
+        del(hologram)
+    except:
+        hologram = HologramCloud(dict(), network='cellular')
+    else:
+        hologram = HologramCloud(dict(), network='cellular')
 
     modem_disconnect = hologram.network.modem.disconnect()
     network_disconnect = hologram.network.disconnect()
