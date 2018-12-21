@@ -27,7 +27,17 @@ while True:
     if image_sent:
         break
 
-    result = hologram.network.connect()
+    hologram.network.modem.disconnect()
+    hologram.network.disconnect()
+
+    sleep(5)
+
+    try:
+        del(result)
+    except:
+        result = hologram.network.connect()
+    else:
+        result = hologram.network.connect()
 
     if result == False:
         print ' Failed to connect to cell network. Try number ' + str(count + 1)
