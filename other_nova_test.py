@@ -5,6 +5,7 @@ import datetime
 import time
 import base64
 import os
+import shutil
 
 count = 0
 hour = 3600
@@ -13,6 +14,15 @@ first_try = True
 
 while True:
     if first_try:
+        timestamp = str(int(time.time()))
+        log_path = "/home/pi/codebase/nova_log.txt"
+        new_path = "/home/pi/codebase/logs/%s.txt" % (timestamp)
+
+        if os.path.exists(log_path):
+            shutil.copy(log_path, new_path)
+
+        open(log_path, 'w').close()
+
         first_try = False
         start_time = int(time.time())
 
@@ -56,22 +66,13 @@ while True:
 
             count = 0
             first_try = True
-            timestamp = str(int(time.time()))
-            log_path = "/home/pi/codebase/nova_log.txt"
-            new_path = "/home/pi/codebase/logs/%s.txt" % (timestamp)
-
-            if os.path.exists(log_path):
-                os.rename(log_path, new_path)
-
-            open(log_path, 'w')
 
             sleep(sleep_time)
-
             continue
         else:
             count += 1
-            sleep(20)
 
+            sleep(20)
             continue
     else:
         camera = PiCamera()
@@ -127,20 +128,14 @@ while True:
         if morning:
             morning = False
             sleep_time = ((hour * 7) - (end_time - start_time))
+            print "Morning image posted. %d seconds until next image." % (str(sleep_time))
         else:
             morning = True
             sleep_time = ((hour * 17) - (end_time - start_time))
+            print "Afternoon image posted. %d seconds until next image." % (str(sleep_time))
 
         count = 0
         first_try = True
-        log_path = "/home/pi/codebase/nova_log.txt"
-        new_path = "/home/pi/codebase/logs/%s.txt" % (timestamp)
-
-        if os.path.exists(log_path):
-            os.rename(log_path, new_path)
-
-        open(log_path, 'w')
 
         sleep(sleep_time)
-
         continue
