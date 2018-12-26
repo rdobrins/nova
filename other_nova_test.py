@@ -56,12 +56,22 @@ while True:
 
             count = 0
             first_try = True
+            timestamp = str(int(time.time()))
+            log_path = "/home/pi/codebase/nova_log.txt"
+            new_path = "/home/pi/codebase/logs/%s.txt" % (timestamp)
+
+            if os.path.exists(log_path):
+                os.rename(log_path, new_path)
+
+            open(log_path, 'w')
 
             sleep(sleep_time)
+
             continue
         else:
             count += 1
             sleep(20)
+
             continue
     else:
         camera = PiCamera()
@@ -81,7 +91,7 @@ while True:
         chars_divided = character_count / 5000
         num_of_messages = chars_divided + 1
         integer = (int(num_of_messages) + 1)
-        timestamp = int(time.time())
+        timestamp = str(int(time.time()))
         divider = "_DIVIDER_"
 
         print "%s characters in %s messages" % (str(character_count),str(num_of_messages))
@@ -91,7 +101,7 @@ while True:
             end_char = (n * 5000)
             section_of_image = encoded_string[start_char:end_char]
             message = "".join([
-                "stamp", divider, str(timestamp), divider,
+                "stamp", divider, timestamp, divider,
                 "cluster_order", divider, str(n), divider,
                 "number_of_fragments", divider, str(num_of_messages), divider,
                 "total_character_count", divider, str(character_count), divider,
@@ -123,6 +133,13 @@ while True:
 
         count = 0
         first_try = True
+        log_path = "/home/pi/codebase/nova_log.txt"
+        new_path = "/home/pi/codebase/logs/%s.txt" % (timestamp)
+
+        if os.path.exists(log_path):
+            os.rename(log_path, new_path)
+
+        open(log_path, 'w')
 
         sleep(sleep_time)
 
