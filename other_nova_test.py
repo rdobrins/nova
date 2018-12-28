@@ -53,21 +53,36 @@ while True:
         result = hologram.network.connect()
 
     if result == False:
-        print ' Failed to connect to cell network. Try number ' + str(count + 1)
+        print ' Failed to connect to cell network. Try number %s' % (str(count + 1))
         if count > 4:
+            sleep(5)
+
+            hologram.network.modem.disconnect()
+            hologram.network.disconnect()
+
+            sleep(5)
+
             end_time = int(time.time())
 
             if morning:
                 morning = False
-                sleep_time = ((hour * 7) - (end_time - start_time))
+                sleep_array = range(1, 8)
             else:
                 morning = True
-                sleep_time = ((hour * 17) - (end_time - start_time))
+                sleep_array = range(1, 18)
 
             count = 0
             first_try = True
+            run_time = end_time - start_time
 
-            sleep(sleep_time)
+            for sleep_hour in sleep_array:
+                print "Sleep hour %s" % str(sleep_hour)
+                if sleep_hour == 1:
+                    sleep_time = hour - run_time
+                    sleep(sleep_time)
+                else:
+                    sleep(hour)
+
             continue
         else:
             count += 1
@@ -127,15 +142,21 @@ while True:
 
         if morning:
             morning = False
-            sleep_time = ((hour * 7) - (end_time - start_time))
-            print "Morning image posted. %d seconds until next image." % (str(sleep_time))
+            sleep_array = range(1, 8)
         else:
             morning = True
-            sleep_time = ((hour * 17) - (end_time - start_time))
-            print "Afternoon image posted. %d seconds until next image." % (str(sleep_time))
+            sleep_array = range(1, 18)
 
         count = 0
         first_try = True
+        run_time = end_time - start_time
 
-        sleep(sleep_time)
+        for sleep_hour in sleep_array:
+            print "Sleep hour %s" % (str(sleep_hour))
+            if sleep_hour == 1:
+                sleep_time = hour - run_time
+                sleep(sleep_time)
+            else:
+                sleep(hour)
+
         continue

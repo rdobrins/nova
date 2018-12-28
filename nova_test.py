@@ -5,9 +5,20 @@ import datetime
 import time
 import base64
 import os
+import logging
 
 count = 0
 image_sent = False
+
+timestamp = time.time()
+stamp_string = str(int(timestamp))
+file_name = "logs/%s.out" % (stamp_string)
+
+logging.basicConfig(filename=file_name,level=logging.DEBUG,filemode='w')
+logger = logging.getLogger("OUTPUT")
+
+time_string = "Time is %s" % (str(timestamp))
+logger.debug(time_string)
 
 while True:
     try:
@@ -20,7 +31,8 @@ while True:
     modem_disconnect = hologram.network.modem.disconnect()
     network_disconnect = hologram.network.disconnect()
 
-    print "DISCONNECTIONS => Network: " + str(network_disconnect) + " Modem: " + str(modem_disconnect)
+    initial_disconnections_string = "INITIAL DISCONNECTIONS => Network: " + str(network_disconnect) + " Modem: " + str(modem_disconnect)
+    logger.debug(initial_disconnections_string)
 
     sleep(5)
 
@@ -40,18 +52,26 @@ while True:
         result = hologram.network.connect()
 
     if result == False:
-        print ' Failed to connect to cell network. Try number ' + str(count + 1)
+        failure_to_connect_string = 'Failed to connect to cell network. Try number ' + str(count + 1)
+        logger.debug(failure_to_connect_string)
+
         if count > 4:
+            failed_to_connect = "FAILED TO CONNECT."
+            logger.debug(failed_to_connect)
             break
         else:
             count += 1
             sleep(20)
+            retry_to_connect = "RETRY TO CONNECT."
+            logger.debug(retry_to_connect)
+            continue
     else:
         camera = PiCamera()
         date = datetime.datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
         image_title = "image_" + date + ".jpg"
         image_path = "/home/pi/codebase/images/" + image_title
 
+        camera.resolution = (720, 480)
         camera.start_preview()
         sleep(4)
         camera.capture(image_path)
@@ -67,7 +87,8 @@ while True:
         timestamp = int(time.time())
         divider = "_DIVIDER_"
 
-        print "%s characters in %s messages" % (str(character_count),str(num_of_messages))
+        chars_in_msg_string = "%s characters in %s messages" % (str(character_count),str(num_of_messages))
+        logger.debug(chars_in_msg_string)
 
         for n in range(1,integer):
             start_char = ((n - 1) * 5000)
@@ -80,21 +101,31 @@ while True:
                 "total_character_count", divider, str(character_count), divider,
                 "content", divider, section_of_image
             ])
-            print "Sending message %d" % (n)
+            sending_msg_string = "Sending message %d" % (n)
+            logger.debug(sending_msg_string)
+
             response_code = hologram.sendMessage(message, topics = ["pi-one"])
-            print hologram.getResultString(response_code)
+            hologram_result_string = hologram.getResultString(response_code)
+            logger.debug(hologram_result_string)
             sleep(2)
 
         final_modem_disconnect = hologram.network.modem.disconnect()
         final_network_disconnect = hologram.network.disconnect()
 
-        print "FINAL DISCONNECTIONS => Network: " + str(final_network_disconnect) + " Modem: " + str(final_modem_disconnect)
+        final_disconnections_string = "FINAL DISCONNECTIONS => Network: " + str(final_network_disconnect) + " Modem: " + str(final_modem_disconnect)
+        logger.debug(final_disconnections_string)
 
         if os.path.exists(image_path):
             os.remove(image_path)
+            file_removed_string = image_title + " removed."
+            logger.debug(file_removed_string)
         else:
-            print(image_title + " does not exist.")
+            no_file_string = image_title + " does not exist."
+            logger.debug(no_file_string)
 
         image_sent = True
+
+        time_complete_string = "COMPLETE at %s" % (str(time.time()))
+        logger.debug(time_complete_string)
 
         break
